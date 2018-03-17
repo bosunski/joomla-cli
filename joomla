@@ -1,0 +1,61 @@
+#!/usr/bin/env php
+<?php
+if (php_sapi_name() != 'cli')
+{
+	exit(1);
+}
+
+// We are a valid entry point.
+const _JEXEC = 1;
+
+/**
+ * Set initial value for debug to improve "undefined notice" in fof.
+ * Do not change this value at this point, because fof causes a fatal error
+ * calling to a member function logAddLogger() on null.
+ */
+const JDEBUG = 0;
+
+// Define core extension id
+const CORE_EXTENSION_ID = 700;
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Load system defines
+if (file_exists(__DIR__ . '/defines.php'))
+{
+	require_once __DIR__ . '/defines.php';
+}
+
+if (!defined('_JDEFINES'))
+{
+	define('JPATH_BASE', __DIR__);
+	require_once JPATH_BASE . '/includes/defines.php';
+}
+
+require_once JPATH_LIBRARIES . '/import.legacy.php';
+require_once JPATH_LIBRARIES . '/cms.php';
+
+// Load the configuration
+require_once JPATH_CONFIGURATION . '/configuration.php';
+
+// Load the JApplicationCli class
+JLoader::import('joomla.application.cli');
+JLoader::import('joomla.application.component.helper');
+JLoader::import('joomla.filesystem.folder');
+JLoader::import('joomla.filesystem.file');
+
+// Load Console Main
+if (file_exists('cli/Jcli/Console.php'))
+{
+    require_once('cli/Jcli/Console.php');
+}
+
+// Get an Instance of the console
+$cliapp = Console::getInstance();
+
+// Run the Console Application and gets the Exit Status
+$status = $cliapp->run();
+
+// Terminate based on Exit Status
+exit($status);
